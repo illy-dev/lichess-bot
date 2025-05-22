@@ -9,6 +9,7 @@ import random
 from lib.engine_wrapper import MinimalEngine
 from lib.lichess_types import MOVE, HOMEMADE_ARGS_TYPE
 import logging
+from engines.bot.main import get_move
 
 
 # Use this logger variable to print messages to the console or log files.
@@ -19,6 +20,35 @@ logger = logging.getLogger(__name__)
 
 class ExampleEngine(MinimalEngine):
     """An example engine that all homemade engines inherit."""
+
+
+import chess
+from chess.engine import PlayResult, Limit
+from lib.engine_wrapper import MinimalEngine
+from lib.lichess_types import MOVE, HOMEMADE_ARGS_TYPE
+from engines.bot.main import get_move  # This is your function
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class flybot(ExampleEngine):
+    def search(self,
+               board: chess.Board,
+               time_limit: Limit,
+               ponder: bool,
+               draw_offered: bool,
+               root_moves: MOVE) -> PlayResult:
+        logger.info("FLY-bot...")
+        legal_moves = list(board.legal_moves)
+        if isinstance(root_moves, list):
+            allowed_moves = [m for m in legal_moves if m in root_moves]
+        else:
+            allowed_moves = legal_moves
+
+        best_move = get_move(board, depth=4, candidate_moves=allowed_moves)
+
+        return PlayResult(best_move, None, draw_offered=draw_offered)
 
 
 # Bot names and ideas from tom7's excellent eloWorld video
